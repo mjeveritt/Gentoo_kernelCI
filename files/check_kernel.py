@@ -180,10 +180,6 @@ print(extra)
 print("experimental patch" )
 print(experimental)
 
-print("removing experimental patch")
-for i in experimental:
-    os.remove(mypath+'/'+i)
-
 cwd = os.getcwd()
 
 bashCommand = "chmod +x patch-kernel.sh"

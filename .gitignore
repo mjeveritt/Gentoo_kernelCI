@@ -1,0 +1,7 @@
+http.log
+twistd.*
+buildbot.tac
+password
+workers.cfg
+state.sqlite
+gitpoller-work/

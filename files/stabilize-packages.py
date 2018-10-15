@@ -17,9 +17,13 @@ gentoo_repo = '../gentoo/'
 def command(cmd):
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                             universal_newlines=True)
+    fail = True
     for line in proc.stdout:
-        print(line.strip())
-    return proc.returncode
+        a = line.strip()
+        print(a)
+        if 'Creating Manifest' in str(a):
+            fail = False
+    return fail
 
 
 conf_var = "shelve"
@@ -56,13 +60,13 @@ ebg.close()
 os.chmod('ebuild_merge.sh', 0o755)
 os.chmod('ebuild_manifest.sh', 0o755)
 
-result = command('./ebuild_manifest.sh')
-if result > 0:
+failed = command('./ebuild_manifest.sh')
+if failed:
     print("Manifest generation failed")
     sys.exit(1)
 
-result = command('./ebuild_merge.sh')
-if result > 0:
+failed = command('./ebuild_merge.sh')
+if failed:
     print("Emerging failed")
     sys.exit(1)
 

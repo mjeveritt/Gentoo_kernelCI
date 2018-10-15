@@ -5,13 +5,15 @@ import sys
 import shelve
 import subprocess
 
-print('Number of arguments:', len(sys.argv), 'arguments.')
-print('Argument List:', str(sys.argv))
+# print('Number of arguments:', len(sys.argv), 'arguments.')
+# print('Argument List:', str(sys.argv))
 
 packages = sys.argv[1:]
-# filter manifest files
+# filter out Manifest files
 packages = [v for v in packages if "Manifest" not in v]
+
 gentoo_repo = '../gentoo/'
+versions = []
 
 
 def command(cmd):
@@ -25,11 +27,6 @@ def command(cmd):
             fail = False
     return fail
 
-
-conf_var = "shelve"
-d = shelve.open(conf_var)
-d["version"] = []
-versions = []
 
 # write script headers
 with open('ebuild_merge.sh', 'w') as eb1:
@@ -70,5 +67,7 @@ if failed:
     print("Emerging failed")
     sys.exit(1)
 
+conf_var = "shelve"
+d = shelve.open(conf_var)
 d["version"] = versions
 d.close()

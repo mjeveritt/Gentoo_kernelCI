@@ -82,8 +82,8 @@ else:
     print("vmimage present: " + vmimage_src)
 
 # Create snapshot of base image for build
-cmd_clone_qemu_img = 'qemu-img create -f qcow2 -b ' + vmimage_src + ' ' + \
-                     vmimage_dest
+cmd_clone_qemu_img = 'qemu-img create -f qcow2 -b /tmp/' + vmimage_src + ' ' + \
+                     '/tmp/' + vmimage_dest
 proc2 = subprocess.Popen(cmd_clone_qemu_img, stdout=subprocess.PIPE, shell=True)
 for line in proc2.stdout:
     print(line.strip())

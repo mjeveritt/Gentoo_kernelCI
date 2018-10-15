@@ -16,15 +16,15 @@ gentoo_repo = '../gentoo/'
 versions = []
 
 
-def command(cmd):
+def command(cmd, fail_trigger):
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                             universal_newlines=True)
-    fail = True
+    fail = False
     for line in proc.stdout:
         a = line.strip()
         print(a)
-        if 'Creating Manifest' in str(a):
-            fail = False
+        if fail_trigger in str(a):
+            fail = True
     return fail
 
 
@@ -48,7 +48,7 @@ for package in packages:
     print("  {0}".format(ebuild_full))
 
     ebm.write(ebuild_full + ' clean manifest\n')
-    ebg.write(ebuild_full + ' merge\n')
+    ebg.write(ebuild_full + ' install\n')
 
     versions.append(package)
 ebm.close()
@@ -57,12 +57,12 @@ ebg.close()
 os.chmod('ebuild_merge.sh', 0o755)
 os.chmod('ebuild_manifest.sh', 0o755)
 
-failed = command('./ebuild_manifest.sh')
+failed = command('./ebuild_manifest.sh', 'waffle')
 if failed:
     print("Manifest generation failed")
     sys.exit(1)
 
-failed = command('./ebuild_merge.sh')
+failed = command('./ebuild_merge.sh', 'wiffle')
 if failed:
     print("Emerging failed")
     sys.exit(1)

@@ -29,24 +29,25 @@ versions = []
 
 # write script headers
 with open('ebuild_merge.sh', 'w') as eb1:
-    eb1.write("#!/bin/sh")
-    eb1.write("set -e")
+    eb1.write("#!/bin/sh\n")
+    eb1.write("set -e\n")
 
 with open('ebuild_manifest.sh', 'w') as eb2:
-    eb2.write("#!/bin/sh")
-    eb2.write("set -e")
+    eb2.write("#!/bin/sh\n")
+    eb2.write("set -e\n")
 
 
 ebm = open("ebuild_manifest.sh", 'a')
 ebg = open("ebuild_merge.sh", 'a')
 for package in packages:
+    # .sort(key=lambda s: [int(u) for u in s.split('.')]):
     print("Processing: {0}".format(package))
     ebuild_location = gentoo_repo + package
     ebuild_full = 'ROOT=kernel_sources/ /usr/bin/ebuild ' + ebuild_location
     print("  {0}".format(ebuild_full))
 
-    ebm.write(ebuild_full + ' clean manifest')
-    ebg.write(ebuild_full + ' merge ')
+    ebm.write(ebuild_full + ' clean manifest\n')
+    ebg.write(ebuild_full + ' merge\n')
 
     versions.append(package)
 ebm.close()

@@ -71,14 +71,14 @@ if not os.path.isfile(vmimage_src):
     proc2 = subprocess.Popen(cmd_wget, stdout=subprocess.PIPE, shell=True)
     for line in proc2.stdout:
         print(line.strip())
-    if not os.path.isfile(vmimage):
+    if not os.path.isfile(vmimage_src):
         print("Cannot download file: " + ImageURI)
         sys.exit(1)
 else:
-    print("vmimage present: " + vmimage)
+    print("vmimage present: " + vmimage_src)
 
 # Create snapshot of base image for build
-cmd_clone_qemu_img = 'qemu-img create -f qcow2 -b ' + vmimage_src + ' ' \
+cmd_clone_qemu_img = 'qemu-img create -f qcow2 -b ' + vmimage_src + ' ' + \
                      vmimage_dest
 proc2 = subprocess.Popen(cmd_clone_qemu_img, stdout=subprocess.PIPE, shell=True)
 for line in proc2.stdout:

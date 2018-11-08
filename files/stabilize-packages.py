@@ -5,9 +5,6 @@ import sys
 import shelve
 import subprocess
 
-# print('Number of arguments:', len(sys.argv), 'arguments.')
-# print('Argument List:', str(sys.argv))
-
 packages = sys.argv[1:]
 # filter out Manifest files
 packages = [v for v in packages if "Manifest" not in v]
@@ -16,30 +13,30 @@ gentoo_repo = '../gentoo/'
 versions = []
 
 
-def command(cmd, fail_trigger):
+def run_command(cmd, trigger_text):
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                             universal_newlines=True)
-    fail = False
+    not_found = True
     for line in proc.stdout:
         a = line.strip()
         print(a)
-        if fail_trigger in str(a):
-            fail = True
-    return fail
+        if trigger_text in str(a):
+            not_found = False
+    return not_found
 
 
 # write script headers
-with open('ebuild_merge.sh', 'w') as eb1:
-    eb1.write("#!/bin/sh\n")
-    eb1.write("set -e\n")
+with open('ebuild_merge.sh', 'w') as ebuild_merge:
+    ebuild_merge.write("#!/bin/sh\n")
+    ebuild_merge.write("set -e\n")
 
-with open('ebuild_manifest.sh', 'w') as eb2:
-    eb2.write("#!/bin/sh\n")
-    eb2.write("set -e\n")
+with open('ebuild_manifest.sh', 'w') as ebuild_manifest:
+    ebuild_manifest.write("#!/bin/sh\n")
+    ebuild_manifest.write("set -e\n")
 
 
-ebm = open("ebuild_manifest.sh", 'a')
-ebg = open("ebuild_merge.sh", 'a')
+ebuild_manifest = open("ebuild_manifest.sh", 'a')
+ebuild_merge = open("ebuild_merge.sh", 'a')
 for package in packages:
     # .sort(key=lambda s: [int(u) for u in s.split('.')]):
     print("Processing: {0}".format(package))
@@ -47,23 +44,25 @@ for package in packages:
     ebuild_full = 'ROOT=kernel_sources/ /usr/bin/ebuild ' + ebuild_location
     print("  {0}".format(ebuild_full))
 
-    ebm.write(ebuild_full + ' clean manifest\n')
-    ebg.write(ebuild_full + ' install\n')
+    ebuild_manifest.write(ebuild_full + ' clean manifest\n')
+    ebuild_merge.write(ebuild_full + ' install\n')
 
     versions.append(package)
-ebm.close()
-ebg.close()
+ebuild_manifest.close()
+ebuild_merge.close()
 
+# make scripts executable
 os.chmod('ebuild_merge.sh', 0o755)
 os.chmod('ebuild_manifest.sh', 0o755)
 
-failed = command('./ebuild_manifest.sh', 'waffle')
-if failed:
+# run the built scripts ...
+result = run_command('./ebuild_manifest.sh', 'Error')
+if result is False:
     print("Manifest generation failed")
     sys.exit(1)
 
-failed = command('./ebuild_merge.sh', 'wiffle')
-if failed:
+result = run_command('./ebuild_merge.sh', 'Error')
+if result is False:
     print("Emerging failed")
     sys.exit(1)
 
